@@ -37,7 +37,7 @@ public class Plotter extends AutoComponent {
 
 	private boolean mouseInMap = false;
 	private boolean mouseInBounds = false;
-	
+
 	private boolean displayWarning = false;
 
 	private double startAngle;
@@ -55,9 +55,10 @@ public class Plotter extends AutoComponent {
 
 	public void update(GameContainer ac, float dt) {
 
-		if (parent.selectedNode == 0)
-			startAngle = Math.toRadians(((NodeEditor) parent.getComponent("nodeeditor")).getAngleField().getValue());
-
+		if (parent.selectedNode == 0) {
+			startAngle = Math.toRadians(((NodeEditor) parent.getComponent("nodeeditor")).getAngleField().getValue() - 90);
+		}
+		
 		int mx = ac.getInput().getMouseX();
 		int my = ac.getInput().getMouseY();
 		mouseInMap = mapBounds.contains(mx, my);
@@ -93,7 +94,7 @@ public class Plotter extends AutoComponent {
 							parent.nodes.add(new Node(mx, my, this));
 						}
 						if (parent.nodes.size() > 1) {
-							parent.nodes.get(parent.nodes.size() - 1).setAngle(getAngle(parent.nodes.get(parent.nodes.size() - 2), parent.nodes.get(parent.nodes.size() - 1)));
+							parent.nodes.get(parent.nodes.size() - 1).setAngle(normalizeAngle(getAngle(parent.nodes.get(parent.nodes.size() - 2), parent.nodes.get(parent.nodes.size() - 1)) + 90));
 							parent.nodes.get(parent.nodes.size() - 1).setSpeed(parent.nodes.get(parent.nodes.size() - 2).getSpeed());
 						}
 						setSelectedNode(parent.nodes.size() - 1);
@@ -108,7 +109,7 @@ public class Plotter extends AutoComponent {
 		if (mouseInMap) {
 			Node mousePt = ac.getInput().isKeyDown(KeyEvent.VK_SHIFT) ? getSnappedNode(ac.getInput().getMouseX(), ac.getInput().getMouseY()) : new Node(ac.getInput().getMouseX(), ac.getInput().getMouseY(), this);
 			if (mouseInBounds) {
-				if(displayWarning) {
+				if (displayWarning) {
 					r.drawString("Robot MUST cross defenses perpendicularly!", 0xffffffff, mousePt.x, mousePt.y);
 				}
 				r.drawImage(Assets.imgMousePt, mousePt.x - Assets.imgMousePt.width / 2, mousePt.y - Assets.imgMousePt.height / 2);
@@ -210,5 +211,14 @@ public class Plotter extends AutoComponent {
 
 	public Rectangle getOuterWorksBounds() {
 		return outerWorksBounds;
+	}
+	
+	private static double normalizeAngle(double angle) {
+		double newAngle = angle;
+		while (newAngle < -180)
+			newAngle += 360;
+		while (newAngle > 180)
+			newAngle -= 360;
+		return newAngle;
 	}
 }

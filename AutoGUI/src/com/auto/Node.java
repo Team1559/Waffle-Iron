@@ -31,7 +31,7 @@ public class Node {
 		speed = 0.5f;
 		waitTime = 0.0f;
 		shoot = false;
-		angle = -90;
+		angle = 0;
 	}
 
 	public void setShoot(boolean b) {

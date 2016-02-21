@@ -13,17 +13,17 @@ import com.main.GameFrame;
 public class MainComponent extends GameFrame {
 
 	AutoContainer container;
-
+	
 	public MainComponent() {
 		container = new AutoContainer();
 	}
 
 	public void init(GameContainer ac) {
 		container.addComponent(new DefenseSelector(10, 160));
-		container.addComponent(new NodeEditor(10, 10));
 		container.addComponent(new StepRecorder(750, 110));
 		container.addComponent(new ControlsPane(750, 10));
 		container.addComponent(new Map(240, 10));
+		container.addComponent(new NodeEditor(10, 10));
 		container.getMap().addPlotter(ac);
 		container.init(ac);
 		((Plotter) container.getMap().getPlotter()).addListener((NodeEditor) container.getComponent("nodeeditor"));

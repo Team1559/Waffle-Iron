@@ -53,6 +53,7 @@ public class Map extends AutoComponent {
 				}
 			}
 		}
+		
 		if (highlightedSpot >= 1 && highlightedSpot <= 4 && ((DefenseSelector) parent.getComponent("defenseselector")).getSelectedDefense() != Defense.NULL && ac.getInput().isButtonPressed(1)) {
 			defenses[highlightedSpot] = ((DefenseSelector) parent.getComponent("defenseselector")).getSelectedDefense();
 		}

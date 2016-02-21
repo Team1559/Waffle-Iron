@@ -12,7 +12,7 @@ import java.util.Vector;
 import javax.swing.JFileChooser;
 
 import com.auto.components.ControlsPane;
-import com.auto.components.Map;
+import com.auto.components.NodeEditor;
 import com.auto.components.Plotter;
 import com.main.GameContainer;
 
@@ -40,20 +40,32 @@ public class WaffleExporter {
 					instructions.add("TURN " + dAngle);
 					int defenseBoundary = plotter.getOuterWorksBounds().y + plotter.getOuterWorksBounds().height / 2;
 					if ((n.y > defenseBoundary && auto.nodes.get(i - 1).y < defenseBoundary) || (n.y < defenseBoundary && auto.nodes.get(i - 1).y > defenseBoundary)) {
-						
-						instructions.add("GO distance=\"" + getDistanceInches(nodes.get(i - 1), new Node(nodes.get(i - 1).x, plotter.getOuterWorksBounds().y + plotter.getOuterWorksBounds().height, plotter)) + "\" speed=\"" + new DecimalFormat("0.00").format(n.getSpeed()) + "\"");
-						if (n.x < plotter.BORDER_12) {
-							instructions.add("DEFENSE id=\"low bar\" active=\"true\"");
-						} else if (n.x < plotter.BORDER_23) {
-							instructions.add("DEFENSE id=\"" + ((Map) auto.getComponent("map")).getDefenses()[1].getName().toLowerCase() + "\" active=\"true\"");
-						} else if (n.x < plotter.BORDER_34) {
-							instructions.add("DEFENSE id=\"" + ((Map) auto.getComponent("map")).getDefenses()[2].getName().toLowerCase() + "\" active=\"true\"");
-						} else if (n.x < plotter.BORDER_45) {
-							instructions.add("DEFENSE id=\"" + ((Map) auto.getComponent("map")).getDefenses()[3].getName().toLowerCase() + "\" active=\"true\"");
+						double distanceToOuterWorks = 0;
+						if (n.y < defenseBoundary) {
+							distanceToOuterWorks = getDistanceInches(new Node(0, (int) (nodes.get(i - 1).y - NodeEditor.ROBOT_HEIGHT_BUMPERS_INCHES / 2), plotter), new Node(0, plotter.getOuterWorksBounds().y + plotter.getOuterWorksBounds().height, plotter));
 						} else {
-							instructions.add("DEFENSE id=\"" + ((Map) auto.getComponent("map")).getDefenses()[4].getName().toLowerCase() + "\" active=\"true\"");
+							distanceToOuterWorks = getDistanceInches(new Node(0, (int) (nodes.get(i - 1).y + NodeEditor.ROBOT_HEIGHT_BUMPERS_INCHES / 2), plotter), new Node(0, plotter.getOuterWorksBounds().y, plotter));
 						}
-						instructions.add("GO distance=\"" + getDistanceInches(n, new Node(nodes.get(i - 1).x, plotter.getOuterWorksBounds().y, plotter)) + "\" speed=\"" + new DecimalFormat("0.00").format(n.getSpeed()) + "\"");
+						instructions.add("GO distance=\"" + distanceToOuterWorks + "\" speed=\"" + new DecimalFormat("0.00").format(n.getSpeed()) + "\"");
+						if (n.x < plotter.BORDER_12) {
+							instructions.add("DEFENSE id=\"low_bar\" active=\"true\"");
+						} else if (n.x < plotter.BORDER_23) {
+							instructions.add("DEFENSE id=\"" + auto.getMap().getDefenses()[1].getName().toLowerCase().replace(' ', '_') + "\" active=\"true\"");
+						} else if (n.x < plotter.BORDER_34) {
+							instructions.add("DEFENSE id=\"" + auto.getMap().getDefenses()[2].getName().toLowerCase().replace(' ', '_') + "\" active=\"true\"");
+						} else if (n.x < plotter.BORDER_45) {
+							instructions.add("DEFENSE id=\"" + auto.getMap().getDefenses()[3].getName().toLowerCase().replace(' ', '_') + "\" active=\"true\"");
+						} else {
+							instructions.add("DEFENSE id=\"" + auto.getMap().getDefenses()[4].getName().toLowerCase().replace(' ', '_') + "\" active=\"true\"");
+						}
+						instructions.add("TURN 0.0");
+						double distanceFromOuterWorks = 0;
+						if (n.y < defenseBoundary) {
+							distanceFromOuterWorks = getDistanceInches(new Node(0, (int) (n.y + NodeEditor.ROBOT_HEIGHT_BUMPERS_INCHES / 2), plotter), new Node(0, plotter.getOuterWorksBounds().y,plotter));
+						} else {
+							distanceFromOuterWorks = getDistanceInches(new Node(0, (int) (n.y - NodeEditor.ROBOT_HEIGHT_BUMPERS_INCHES / 2), plotter), new Node(0, plotter.getOuterWorksBounds().y + plotter.getOuterWorksBounds().height,plotter));
+						}
+						instructions.add("GO distance=\"" + distanceFromOuterWorks + "\" speed=\"" + new DecimalFormat("0.00").format(n.getSpeed()) + "\"");
 					} else {
 						instructions.add("GO distance=\"" + dist + "\" speed=\"" + new DecimalFormat("0.00").format(n.getSpeed()) + "\"");
 					}

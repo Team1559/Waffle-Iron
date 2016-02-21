@@ -87,7 +87,7 @@ public class DefenseSelector extends AutoComponent {
 			}
 		} else {
 			clickLocation = new Point(-1, -1);
-			if(ac.getInput().isButtonPressed(1)) {
+			if(ac.getInput().isButtonReleased(1)) {
 				selectedDefense = -1;
 			}
 		}

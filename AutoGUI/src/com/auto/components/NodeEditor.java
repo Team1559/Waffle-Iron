@@ -18,8 +18,8 @@ import com.main.GameContainer;
 public class NodeEditor extends AutoComponent implements PlotterListener {
 
 	public final float BUMPER_THICKNESS = 3.25f;// M@ Klein was here
-	public final float ROBOT_WIDTH_BUMPERS_INCHES = 34.75f;
-	public final float ROBOT_HEIGHT_BUMPERS_INCHES = 37.75f;
+	public static final float ROBOT_WIDTH_BUMPERS_INCHES = 34.75f;
+	public static final float ROBOT_HEIGHT_BUMPERS_INCHES = 37.75f;
 	public final int THREE = (int) (Math.PI);
 
 	private UIPanel panel;
@@ -55,31 +55,31 @@ public class NodeEditor extends AutoComponent implements PlotterListener {
 			Plotter plotter = parent.getMap().getPlotter();
 			double angle = parent.selectedNode != 0 ? n.getAngle() : ((NodeEditor) parent.getComponent("nodeeditor")).getAngleField().getValue();
 			angle += 90;
-			robotPoints[0] = new Node(rotatePoint(n.x - plotter.xToPixels(ROBOT_WIDTH_BUMPERS_INCHES) / 2, n.y - plotter.yToPixels(ROBOT_HEIGHT_BUMPERS_INCHES) / 2, new Point(n.x, n.y), angle), plotter);
-			robotPoints[1] = new Node(rotatePoint(n.x - plotter.xToPixels(ROBOT_WIDTH_BUMPERS_INCHES) / 2, n.y + plotter.yToPixels(ROBOT_HEIGHT_BUMPERS_INCHES) / 2, new Point(n.x, n.y), angle), plotter);
-			robotPoints[2] = new Node(rotatePoint(n.x + plotter.xToPixels(ROBOT_WIDTH_BUMPERS_INCHES) / 2, n.y + plotter.yToPixels(ROBOT_HEIGHT_BUMPERS_INCHES) / 2, new Point(n.x, n.y), angle), plotter);
-			robotPoints[3] = new Node(rotatePoint(n.x + plotter.xToPixels(ROBOT_WIDTH_BUMPERS_INCHES) / 2, n.y - plotter.yToPixels(ROBOT_HEIGHT_BUMPERS_INCHES) / 2, new Point(n.x, n.y), angle), plotter);
+			robotPoints[0] = new Node(rotatePoint(n.x - plotter.xToPixels(ROBOT_WIDTH_BUMPERS_INCHES) / 2, n.y - plotter.yToPixels(ROBOT_HEIGHT_BUMPERS_INCHES) / 2, new Point(n.x, n.y), angle + 90), plotter);
+			robotPoints[1] = new Node(rotatePoint(n.x - plotter.xToPixels(ROBOT_WIDTH_BUMPERS_INCHES) / 2, n.y + plotter.yToPixels(ROBOT_HEIGHT_BUMPERS_INCHES) / 2, new Point(n.x, n.y), angle + 90), plotter);
+			robotPoints[2] = new Node(rotatePoint(n.x + plotter.xToPixels(ROBOT_WIDTH_BUMPERS_INCHES) / 2, n.y + plotter.yToPixels(ROBOT_HEIGHT_BUMPERS_INCHES) / 2, new Point(n.x, n.y), angle + 90), plotter);
+			robotPoints[3] = new Node(rotatePoint(n.x + plotter.xToPixels(ROBOT_WIDTH_BUMPERS_INCHES) / 2, n.y - plotter.yToPixels(ROBOT_HEIGHT_BUMPERS_INCHES) / 2, new Point(n.x, n.y), angle + 90), plotter);
 
 			int delta = ac.getInput().isKeyDown(KeyEvent.VK_SHIFT) ? 8 : 1;
 			if (ac.getInput().isKeyPressed(KeyEvent.VK_LEFT)) {
 				n.x -= delta;
-				if(parent.selectedNode > 0) {
-					n.setAngle(getAngle(parent.nodes.get(parent.selectedNode - 1), n));
+				if (parent.selectedNode > 0) {
+					n.setAngle(getAngle(parent.nodes.get(parent.selectedNode - 1), n) + 90);
 				}
 			} else if (ac.getInput().isKeyPressed(KeyEvent.VK_RIGHT)) {
 				n.x += delta;
-				if(parent.selectedNode > 0) {
-					n.setAngle(getAngle(parent.nodes.get(parent.selectedNode - 1), n));
+				if (parent.selectedNode > 0) {
+					n.setAngle(getAngle(parent.nodes.get(parent.selectedNode - 1), n) + 90);
 				}
 			} else if (ac.getInput().isKeyPressed(KeyEvent.VK_UP)) {
 				n.y -= delta;
-				if(parent.selectedNode > 0) {
-					n.setAngle(getAngle(parent.nodes.get(parent.selectedNode - 1), n));
+				if (parent.selectedNode > 0) {
+					n.setAngle(getAngle(parent.nodes.get(parent.selectedNode - 1), n) + 90);
 				}
 			} else if (ac.getInput().isKeyPressed(KeyEvent.VK_DOWN)) {
 				n.y += delta;
-				if(parent.selectedNode > 0) {
-					n.setAngle(getAngle(parent.nodes.get(parent.selectedNode - 1), n));
+				if (parent.selectedNode > 0) {
+					n.setAngle(getAngle(parent.nodes.get(parent.selectedNode - 1), n) + 90);
 				}
 			} else if (ac.getInput().isKeyPressed(KeyEvent.VK_PAGE_UP)) {
 				if (parent.selectedNode == 0) {
@@ -146,12 +146,13 @@ public class NodeEditor extends AutoComponent implements PlotterListener {
 
 		if (n != null) {
 			if (parent.getSelectedNode() != null && showRobotBounds) {
-
 				int color = 0xffffffff;
-				if (!fieldContainsRobot(robotPoints))
-					color = 0xffff0000;
-				for (int i = 0; i < 4; i++) {
-					r.drawLine(robotPoints[i].x, robotPoints[i].y, robotPoints[(i + 1) % 4].x, robotPoints[(i + 1) % 4].y, color);
+				if (robotPoints[0] != null && robotPoints[1] != null && robotPoints[2] != null && robotPoints[3] != null) {
+					if (!fieldContainsRobot(robotPoints))
+						color = 0xffff0000;
+					for (int i = 0; i < 4; i++) {
+						r.drawLine(robotPoints[i].x, robotPoints[i].y, robotPoints[(i + 1) % 4].x, robotPoints[(i + 1) % 4].y, color);
+					}
 				}
 			}
 			// NODE INFORMATION \\
@@ -214,6 +215,9 @@ public class NodeEditor extends AutoComponent implements PlotterListener {
 	}
 
 	private boolean fieldContainsNode(Node n) {
+		if (n == null) {
+			return false;
+		}
 		Plotter plotter = parent.getMap().getPlotter();
 		return plotter.getFieldBounds().contains(n.toPoint()) && !plotter.getPassageBounds().contains(n.toPoint());
 	}
@@ -238,7 +242,7 @@ public class NodeEditor extends AutoComponent implements PlotterListener {
 	public UIScrollField getAngleField() {
 		return angleField;
 	}
-	
+
 	private double getAngle(Node n0, Node n1) {
 		return Math.toDegrees(Math.atan2(n1.y - n0.y, n1.x - n0.x));
 	}
