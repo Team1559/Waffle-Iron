@@ -11,6 +11,7 @@ import com.auto.Assets;
 import com.auto.Node;
 import com.graphics.Font;
 import com.graphics.Renderer;
+import com.input.Input;
 import com.main.GameContainer;
 
 public class Plotter extends AutoComponent {
@@ -58,7 +59,7 @@ public class Plotter extends AutoComponent {
 		if (parent.selectedNode == 0) {
 			startAngle = Math.toRadians(((NodeEditor) parent.getComponent("nodeeditor")).getAngleField().getValue() - 90);
 		}
-		
+
 		int mx = ac.getInput().getMouseX();
 		int my = ac.getInput().getMouseY();
 		mouseInMap = mapBounds.contains(mx, my);
@@ -72,32 +73,31 @@ public class Plotter extends AutoComponent {
 				displayWarning = false;
 				if (parent.getSelectedNode() != null) {
 					int defenseBoundary = outerWorksBounds.y + outerWorksBounds.height / 2;
-					if (!ac.getInput().isKeyDown(KeyEvent.VK_SHIFT) && ((parent.getSelectedNode().y > defenseBoundary && my < defenseBoundary) || (parent.getSelectedNode().y < defenseBoundary && my > defenseBoundary))) {
+					if (!ac.getInput().isKeyDown(KeyEvent.VK_SHIFT) && ((parent.nodes.get(parent.nodes.size() - 1).y > defenseBoundary && my < defenseBoundary) || (parent.nodes.get(parent.nodes.size() - 1).y < defenseBoundary && my > defenseBoundary))) {
 						displayWarning = true;
 					}
 				}
-				if (ac.getInput().isButtonPressed(1)) {
-					if (ac.getInput().isKeyDown(KeyEvent.VK_CONTROL)) {
-						if (getDistance(parent.nodes.get(0), new Point(mx, my)) < Assets.imgRobotPt.width / 2) {
-							setSelectedNode(0);
-						}
-						for (int i = 1; i < parent.nodes.size(); i++) {
-							if (getDistance(parent.nodes.get(i), new Point(mx, my)) < Assets.imgMovePt.width / 2) {
-								setSelectedNode(i);
-								break;
-							}
-						}
+				if (ac.getInput().isButtonPressed(Input.LMB)) {
+					if (ac.getInput().isKeyDown(KeyEvent.VK_SHIFT)) {
+						parent.nodes.add(getSnappedNode(mx, my));
 					} else {
-						if (ac.getInput().isKeyDown(KeyEvent.VK_SHIFT)) {
-							parent.nodes.add(getSnappedNode(mx, my));
-						} else {
-							parent.nodes.add(new Node(mx, my, this));
+						parent.nodes.add(new Node(mx, my, this));
+					}
+					if (parent.nodes.size() > 1) {
+						parent.nodes.get(parent.nodes.size() - 1).setAngle(normalizeAngle(getAngle(parent.nodes.get(parent.nodes.size() - 2), parent.nodes.get(parent.nodes.size() - 1)) + 90));
+						parent.nodes.get(parent.nodes.size() - 1).setSpeed(parent.nodes.get(parent.nodes.size() - 2).getSpeed());
+					}
+					setSelectedNode(parent.nodes.size() - 1);
+				}
+				if (ac.getInput().isButtonPressed(Input.RMB)) {
+					if (getDistance(parent.nodes.get(0), new Point(mx, my)) < Assets.imgRobotPt.width / 2) {
+						setSelectedNode(0);
+					}
+					for (int i = 1; i < parent.nodes.size(); i++) {
+						if (getDistance(parent.nodes.get(i), new Point(mx, my)) < Assets.imgMovePt.width / 2) {
+							setSelectedNode(i);
+							break;
 						}
-						if (parent.nodes.size() > 1) {
-							parent.nodes.get(parent.nodes.size() - 1).setAngle(normalizeAngle(getAngle(parent.nodes.get(parent.nodes.size() - 2), parent.nodes.get(parent.nodes.size() - 1)) + 90));
-							parent.nodes.get(parent.nodes.size() - 1).setSpeed(parent.nodes.get(parent.nodes.size() - 2).getSpeed());
-						}
-						setSelectedNode(parent.nodes.size() - 1);
 					}
 				}
 			}
@@ -212,7 +212,7 @@ public class Plotter extends AutoComponent {
 	public Rectangle getOuterWorksBounds() {
 		return outerWorksBounds;
 	}
-	
+
 	private static double normalizeAngle(double angle) {
 		double newAngle = angle;
 		while (newAngle < -180)

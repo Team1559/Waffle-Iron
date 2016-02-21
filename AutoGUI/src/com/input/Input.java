@@ -10,6 +10,18 @@ import com.main.GameContainer;
 
 public class Input implements KeyListener, MouseListener, MouseMotionListener {
 
+	/**
+	 * {@link MouseListener} ID for the left mouse button.
+	 */
+	public static final int LMB = 1;
+	/**
+	 * {@link MouseListener} ID for the middle mouse button.
+	 */
+	public static final int MMB = 2;
+	/**
+	 * {@link MouseListener} ID for the right mouse button.
+	 */
+	public static final int RMB = 3;
 	private float scale;
 
 	// keyboard

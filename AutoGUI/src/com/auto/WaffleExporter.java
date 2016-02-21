@@ -72,7 +72,7 @@ public class WaffleExporter {
 				}
 			}
 			if (n.isShoot()) {
-				double shootTurnAngle = normalizeAngle(getAngle(n, POINT_TOWER));
+				double shootTurnAngle = normalizeAngle(getAngle(n, POINT_TOWER) + 90);
 				if (shootTurnAngle != 0) {
 					instructions.add("TURN " + shootTurnAngle);
 				}
