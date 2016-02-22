@@ -63,8 +63,13 @@ public class Plotter extends AutoComponent {
 		int mx = ac.getInput().getMouseX();
 		int my = ac.getInput().getMouseY();
 		mouseInMap = mapBounds.contains(mx, my);
-		mouseInBounds = fieldBounds.contains(mx, my) && !passageBounds.contains(mx, my) && !outerWorksBounds.contains(mx, my);
-		if (parent.nodes.size() == 0) {
+		if (ac.getInput().isKeyDown(KeyEvent.VK_SHIFT)) {
+			Node snappedNode = getSnappedNode(mx, my);
+			mouseInBounds = fieldBounds.contains(snappedNode.x, snappedNode.y) && !passageBounds.contains(snappedNode.x, snappedNode.y) && !outerWorksBounds.contains(snappedNode.x, snappedNode.y);
+		} else {
+			mouseInBounds = fieldBounds.contains(mx, my) && !passageBounds.contains(mx, my) && !outerWorksBounds.contains(mx, my);
+		}
+		if (parent.nodes.size() == 0) { // special case for first node.
 			mouseInBounds = mouseInBounds && my > 377;
 		}
 
@@ -73,11 +78,14 @@ public class Plotter extends AutoComponent {
 				displayWarning = false;
 				if (parent.getSelectedNode() != null) {
 					int defenseBoundary = outerWorksBounds.y + outerWorksBounds.height / 2;
-					if (!ac.getInput().isKeyDown(KeyEvent.VK_SHIFT) && ((parent.nodes.get(parent.nodes.size() - 1).y > defenseBoundary && my < defenseBoundary) || (parent.nodes.get(parent.nodes.size() - 1).y < defenseBoundary && my > defenseBoundary))) {
+					if (((parent.nodes.get(parent.nodes.size() - 1).y > defenseBoundary && my < defenseBoundary) || (parent.nodes.get(parent.nodes.size() - 1).y < defenseBoundary && my > defenseBoundary))) {
 						displayWarning = true;
+						if (ac.getInput().isKeyDown(KeyEvent.VK_SHIFT) && getSnappedNode(mx, my).x == parent.nodes.get(parent.nodes.size() - 1).x) {
+							displayWarning = false;
+						}
 					}
 				}
-				if (ac.getInput().isButtonPressed(Input.LMB)) {
+				if (ac.getInput().isButtonPressed(Input.LMB) && !displayWarning) {
 					if (ac.getInput().isKeyDown(KeyEvent.VK_SHIFT)) {
 						parent.nodes.add(getSnappedNode(mx, my));
 					} else {
@@ -110,10 +118,11 @@ public class Plotter extends AutoComponent {
 			Node mousePt = ac.getInput().isKeyDown(KeyEvent.VK_SHIFT) ? getSnappedNode(ac.getInput().getMouseX(), ac.getInput().getMouseY()) : new Node(ac.getInput().getMouseX(), ac.getInput().getMouseY(), this);
 			if (mouseInBounds) {
 				if (displayWarning) {
-					r.drawString("Robot MUST cross defenses perpendicularly!", 0xffffffff, mousePt.x, mousePt.y);
-				}
+					r.drawString("Robot MUST cross defenses perpendicularly (SHIFT)", 0xffffffff, mousePt.x, mousePt.y);
+				} // ayyy lma0 - will merg
 				r.drawImage(Assets.imgMousePt, mousePt.x - Assets.imgMousePt.width / 2, mousePt.y - Assets.imgMousePt.height / 2);
-			} else {
+			}
+			if(!mouseInBounds || displayWarning) {
 				r.drawImage(Assets.imgMousePtRestricted, mousePt.x - Assets.imgMousePtRestricted.width / 2, mousePt.y - Assets.imgMousePtRestricted.height / 2);
 			}
 		}
