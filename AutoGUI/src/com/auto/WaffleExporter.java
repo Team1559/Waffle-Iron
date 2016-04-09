@@ -61,9 +61,9 @@ public class WaffleExporter {
 						instructions.add("TURN 0.0");
 						double distanceFromOuterWorks = 0;
 						if (n.y < defenseBoundary) {
-							distanceFromOuterWorks = getDistanceInches(new Node(0, (int) (n.y + NodeEditor.ROBOT_HEIGHT_BUMPERS_INCHES / 2), plotter), new Node(0, plotter.getOuterWorksBounds().y,plotter));
+							distanceFromOuterWorks = getDistanceInches(new Node(0, (int) (n.y + NodeEditor.ROBOT_HEIGHT_BUMPERS_INCHES / 2), plotter), new Node(0, plotter.getOuterWorksBounds().y, plotter));
 						} else {
-							distanceFromOuterWorks = getDistanceInches(new Node(0, (int) (n.y - NodeEditor.ROBOT_HEIGHT_BUMPERS_INCHES / 2), plotter), new Node(0, plotter.getOuterWorksBounds().y + plotter.getOuterWorksBounds().height,plotter));
+							distanceFromOuterWorks = getDistanceInches(new Node(0, (int) (n.y - NodeEditor.ROBOT_HEIGHT_BUMPERS_INCHES / 2), plotter), new Node(0, plotter.getOuterWorksBounds().y + plotter.getOuterWorksBounds().height, plotter));
 						}
 						instructions.add("GO distance=\"" + distanceFromOuterWorks + "\" speed=\"" + new DecimalFormat("0.00").format(n.getSpeed()) + "\"");
 					} else {
@@ -76,7 +76,7 @@ public class WaffleExporter {
 				if (shootTurnAngle != 0) {
 					instructions.add("TURN " + shootTurnAngle);
 				}
-				instructions.add("SHOOT");
+				instructions.add("SHOOT x=\"" + (n.toInches()[0] - POINT_TOWER.toInches()[0]) + "\" y=\"" + (n.toInches()[1] - POINT_TOWER.toInches()[1]) + "\"");
 			}
 			if (n.getWaitTime() > 0.0f) {
 				instructions.add("WAIT " + n.getWaitTime());
